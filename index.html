@@ -23,7 +23,6 @@
             font-family: 'Space Mono', monospace;
             background-color: var(--bg-primary);
             color: var(--text-primary);
-            overflow: hidden;
         }
         body::after {
             content: " ";
@@ -41,6 +40,20 @@
         }
         @keyframes scanline { 0% { background-position: 0 0; } 100% { background-position: 0 100vh; } }
 
+        .terminal-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: 50px 1fr 40px; /* Header, Main, Ticker */
+            height: 100vh;
+            padding-bottom: 64px; /* Space for mobile nav */
+        }
+        @media (min-width: 1024px) {
+            .terminal-grid {
+                grid-template-columns: 280px 1fr; /* Wider sidebar */
+                grid-template-rows: 60px 1fr 40px; /* Taller header */
+                padding: 16px; /* More padding */
+            }
+        }
         .panel {
             background-color: var(--bg-secondary);
             border: 1px solid var(--border-color);
@@ -214,7 +227,7 @@
             }
 
             async function initSequence() {
-                await typeLog('Booting SR-TERMINAL...');
+                await typeLog('Booting SR-TERMINAL v1.0...');
                 await typeLog('Initializing modules...');
                 await typeLog('Market simulation chart initialized.', 'SUCCESS');
                 await typeLog('Live market ticker started.', 'SUCCESS');
@@ -222,8 +235,11 @@
                 await typeLog('System ready.', 'SUCCESS');
             }
 
-            function updateClock() { if(clockEl) clockEl.textContent = new Date().toLocaleString(); }
-            
+            function updateClock() {
+                if(clockEl) clockEl.textContent = new Date().toLocaleString();
+            }
+            setInterval(updateClock, 1000);
+
             function switchView(targetId) {
                 document.querySelectorAll('.panel.active').forEach(p => p.classList.remove('active'));
                 
