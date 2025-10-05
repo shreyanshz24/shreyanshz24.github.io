@@ -729,34 +729,63 @@
             function initProjectsApp() {
                 const appContainer = document.getElementById('projects-app');
                 appContainer.innerHTML = '';
-                appContainer.appendChild(createAppHeader('Quant Projects'));
+                appContainer.appendChild(createAppHeader('Projects'));
 
                 const projectListContainer = document.createElement('div');
                 projectListContainer.className = 'flex-grow overflow-y-auto p-4 space-y-4';
 
-                const projects = {
-                    'portfolio-v2': {
-                        description: 'My personal portfolio website. Built with NextJS.',
-                        url: 'https://github.com/shreyanshz24/portfolio-v2'
+                const projects = [
+                    {
+                        title: 'Binomial Option Pricer',
+                        status: 'Completed',
+                        description: 'A high-performance option pricing model for both European and American options, implemented in C++ for maximum speed. Demonstrates understanding of financial engineering concepts and efficient algorithm design.',
+                        tech: ['C++', 'Financial Modeling', 'Algorithms']
                     },
-                    'Stock-Price-Prediction': {
-                        description: 'Using LSTMs to predict stock prices.',
-                        url: 'https://github.com/shreyanshz24/Stock-Price-Prediction'
+                    {
+                        title: 'High-Frequency Trading (HFT) Simulator',
+                        status: 'In Progress',
+                        description: 'Building a low-latency event-driven simulator in C++ to backtest HFT strategies. Focuses on order book management, market micro-structure, and minimizing latency.',
+                        tech: ['C++', 'Data Structures', 'Low-Latency Programming']
                     },
-                    'LeetCode-Solutions': {
-                        description: 'A collection of my solutions to LeetCode problems.',
-                        url: 'https://github.com/shreyanshz24/LeetCode-Solutions'
+                    {
+                        title: 'Vectorised Backtester',
+                        status: 'In Progress',
+                        description: 'A high-performance trading strategy backtester built in Python. It leverages vectorization with NumPy and Pandas to eliminate slow loops, allowing for rapid testing of signals on historical data.',
+                        tech: ['Python', 'Pandas', 'NumPy', 'Matplotlib']
+                    },
+                    {
+                        title: 'F1 Race Winner Prediction AI',
+                        status: 'In Progress',
+                        description: 'A machine learning model that predicts Formula 1 race winners. Involved scraping historical data, extensive feature engineering (driver, circuit, and constructor stats), and model tuning.',
+                        tech: ['Python', 'Scikit-learn', 'XGBoost', 'Data Scraping']
+                    },
+                    {
+                        title: 'Real-time Market Data Collector',
+                        status: 'In Progress',
+                        description: 'Developing a Python script to connect to cryptocurrency exchange APIs and WebSocket streams to collect and store real-time trade and order book data for analysis.',
+                        tech: ['Python', 'Websockets', 'REST APIs', 'SQL']
+                    },
+                    {
+                        title: 'Rick Sanchez AI Chatbot',
+                        status: 'In Progress',
+                        description: 'A fun personal project creating a chatbot that mimics the personality and speech patterns of Rick Sanchez using NLP techniques and a custom dataset.',
+                        tech: ['Python', 'NLP', 'NLTK']
                     }
-                };
+                ];
 
-                Object.keys(projects).forEach(key => {
-                    const project = projects[key];
+                projects.forEach(project => {
                     const projectEl = document.createElement('div');
                     projectEl.className = 'p-3 bg-gray-800 rounded-lg';
                     projectEl.innerHTML = `
-                        <h3 class="font-bold text-green-300">${key}</h3>
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-green-300">${project.title}</h3>
+                            <span class="text-xs ${project.status === 'Completed' ? 'bg-green-800 text-green-300' : (project.status === 'In Progress' ? 'bg-yellow-800 text-yellow-300' : 'bg-gray-700 text-gray-300')} px-2 py-0.5 rounded-full">${project.status}</span>
+                        </div>
                         <p class="text-sm text-gray-400 mt-1">${project.description}</p>
-                        <a href="${project.url}" target="_blank" class="text-blue-400 text-sm mt-2 inline-block hover:underline">View on GitHub &rarr;</a>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            ${project.tech.map(t => `<span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">${t}</span>`).join('')}
+                        </div>
+                        ${project.url ? `<a href="${project.url}" target="_blank" class="text-blue-400 text-sm mt-3 inline-block hover:underline">View on GitHub &rarr;</a>` : ''}
                     `;
                     projectListContainer.appendChild(projectEl);
                 });
@@ -772,7 +801,7 @@
                 contentContainer.className = 'flex-grow overflow-y-auto p-4 flex flex-col items-center text-center space-y-4';
                 contentContainer.innerHTML = `
                     <div class="p-2 bg-gray-700 rounded-full">
-                        <img src="assets/asdcds.jpg" alt="Shreyansh Pratap Singh" class="w-32 h-32 rounded-full object-cover">
+                        <img src="https://i.ibb.co/6r1Fv1S/asdcds.jpg" alt="Shreyansh Pratap Singh" class="w-32 h-32 rounded-full object-cover">
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-green-300">👋 Hey there! I'm Shreyansh.</h3>
@@ -792,24 +821,42 @@
                 contentContainer.className = 'flex-grow overflow-y-auto p-4 space-y-6';
                 contentContainer.innerHTML = `
                     <div>
-                        <h3 class="text-lg font-semibold text-green-400 mb-3">Technologies</h3>
+                        <h3 class="text-lg font-semibold text-green-400 mb-3">Programming Languages</h3>
                         <div class="flex flex-wrap gap-3">
                             <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Python</span>
                             <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">C++</span>
                             <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">JavaScript</span>
-                            <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">HTML</span>
-                            <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">CSS</span>
+                             <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">R</span>
                             <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">SQL</span>
                         </div>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-semibold text-green-400 mb-3">Libraries & Frameworks</h3>
+                     <div>
+                        <h3 class="text-lg font-semibold text-green-400 mb-3">Quantitative & Financial Modeling</h3>
                         <div class="flex flex-wrap gap-3">
-                            <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Pandas</span>
-                            <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">NumPy</span>
+                            <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Statistical Analysis</span>
+                            <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Time Series Analysis</span>
+                            <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Options Pricing Theory</span>
+                            <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Algorithmic Trading Concepts</span>
+                            <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Backtesting</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-green-400 mb-3">Machine Learning & AI</h3>
+                        <div class="flex flex-wrap gap-3">
                             <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Scikit-learn</span>
-                             <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">React</span>
+                             <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">TensorFlow & Keras</span>
+                            <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">XGBoost</span>
+                            <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">LSTMs</span>
+                             <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">NLP</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-green-400 mb-3">Data, Web & Backend</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Pandas & NumPy</span>
                             <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Node.js</span>
+                            <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">React</span>
+                            <span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Websockets</span>
                         </div>
                     </div>
                 `;
@@ -824,27 +871,22 @@
                 contentContainer.className = 'flex-grow overflow-y-auto p-6';
                 contentContainer.innerHTML = `
                     <div class="relative">
-                        <!-- Timeline line -->
                         <div class="absolute left-4 top-4 h-full w-0.5 bg-gray-700"></div>
 
-                        <!-- Experience Item 1 -->
                         <div class="relative pl-10 pb-8">
                             <div class="absolute left-0 top-4 h-8 w-8 rounded-full bg-green-500 border-4 border-gray-900 flex items-center justify-center">
                                 <div class="h-2 w-2 rounded-full bg-white"></div>
                             </div>
-                            <h4 class="font-bold text-green-300">Quantitative Researcher</h4>
-                            <p class="text-sm text-gray-400">Future Opportunity</p>
-                            <p class="text-xs text-gray-500">Present</p>
-                        </div>
-                        
-                        <!-- Experience Item 2 -->
-                        <div class="relative pl-10 pb-8">
-                            <div class="absolute left-0 top-4 h-8 w-8 rounded-full bg-gray-700 border-4 border-gray-900 flex items-center justify-center">
-                               <div class="h-2 w-2 rounded-full bg-green-500"></div>
-                            </div>
-                            <h4 class="font-bold text-green-300">Software Development Intern</h4>
-                            <p class="text-sm text-gray-400">Previous Company</p>
-                            <p class="text-xs text-gray-500">Summer 2024</p>
+                            <h4 class="font-bold text-green-300">Self-Employed | Independent Researcher & Developer</h4>
+                            <p class="text-sm text-gray-400">Personal Projects</p>
+                            <p class="text-xs text-gray-500">2023 - Present</p>
+                            <ul class="mt-2 ml-4 list-disc text-sm text-gray-400 space-y-1">
+                                <li>Implemented a high-performance Binomial Option Pricer in C++ for American & European options.</li>
+                                <li>Architecting a low-latency HFT simulator in C++.</li>
+                                <li>Developing a high-performance vectorised backtesting engine in Python.</li>
+                                <li>Building an F1 race prediction model using XGBoost.</li>
+                                <li>Creating real-time data ingestion pipelines using Websockets and APIs.</li>
+                            </ul>
                         </div>
                     </div>
                 `;
@@ -859,16 +901,16 @@
                 contentContainer.className = 'flex-grow overflow-y-auto p-4 space-y-6';
                 contentContainer.innerHTML = `
                     <div class="bg-gray-800 p-4 rounded-lg">
-                        <h4 class="font-bold text-green-300 mb-2">Git & GitHub</h4>
-                        <p class="text-sm text-gray-400">Git and GitHub are my coding sidekicks! They help me track changes, collaborate endlessly, and showcase my digital masterpieces to the world.</p>
+                        <h4 class="font-bold text-green-300 mb-2">Development & Version Control</h4>
+                        <p class="text-sm text-gray-400">VS Code is my primary editor, paired with Git & GitHub for version control. I use CMake for managing C++ projects.</p>
                     </div>
                     <div class="bg-gray-800 p-4 rounded-lg">
-                        <h4 class="font-bold text-green-300 mb-2">VS Code</h4>
-                        <p class="text-sm text-gray-400">VS Code is my coding powerhouse. With its intelligent code completion and lightning-fast debugging, my ideas come to life faster.</p>
+                        <h4 class="font-bold text-green-300 mb-2">Data Science & ML</h4>
+                        <p class="text-sm text-gray-400">I use Jupyter Notebooks for research and prototyping. Key libraries include Pandas, NumPy, Matplotlib, Scikit-learn, and TensorFlow/PyTorch.</p>
                     </div>
                     <div class="bg-gray-800 p-4 rounded-lg">
-                        <h4 class="font-bold text-green-300 mb-2">Notion</h4>
-                        <p class="text-sm text-gray-400">Notion is my digital brain, where I organize my thoughts, dreams, and projects. It’s like a magical notebook that keeps everything in sync.</p>
+                        <h4 class="font-bold text-green-300 mb-2">Productivity</h4>
+                        <p class="text-sm text-gray-400">Notion is my digital brain for organizing project ideas, tracking progress, and taking notes.</p>
                     </div>
                 `;
                 appContainer.appendChild(contentContainer);
@@ -878,4 +920,5 @@
     </script>
 </body>
 </html>
+
 
