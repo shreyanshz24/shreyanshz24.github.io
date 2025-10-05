@@ -3,593 +3,390 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shreyansh Pratap Singh - Portfolio</title>
+    <title>SR-Terminal | Shreyansh Pratap Singh</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-primary: #111827;
+            --bg-secondary: #1a2233;
+            --border-color: #374151;
+            --text-primary: #d1d5db;
+            --text-secondary: #9ca3af;
+            --accent-green: #34d399;
+            --accent-amber: #f59e0b;
+            --accent-blue: #3b82f6;
+        }
         body {
             font-family: 'Space Mono', monospace;
-            color: #d1fae5;
-            background-color: #000;
-        }
-
-        #matrix-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: -10;
-        }
-        
-        .frame-container {
-            position: relative;
-            transition: transform 0.5s ease-in-out;
-        }
-        .frame-container:hover {
-            transform: rotateX(0deg) rotateY(0deg) perspective(1000px);
-        }
-
-        .phone {
-            width: 320px;
-            height: 680px;
-            background: #111;
-            border-radius: 40px;
-            border: 10px solid #000;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 2px #333;
-            transform: rotateX(10deg) rotateY(-10deg) perspective(1000px);
-        }
-        .phone-inner {
-            width: 100%;
-            height: 100%;
-            background: #000;
-            border-radius: 30px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             overflow: hidden;
-            position: relative;
         }
-        .notch {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 20px;
-            background: #000;
-            border-radius: 10px;
-            z-index: 10;
-        }
-
-        .computer {
-            width: 600px;
-            height: 500px;
-            background: #d1d5db;
-            border-radius: 20px;
-            padding: 20px;
-            padding-bottom: 60px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0,0,0,0.3);
-            transform: rotateX(10deg) rotateY(-10deg) perspective(1000px);
-        }
-        .computer-screen-bezel {
-            width: 100%;
-            height: 100%;
-            background: #111;
-            border-radius: 5px;
-            padding: 25px;
-            box-shadow: inset 0 0 10px #000;
-        }
-        .computer-screen {
-            width: 100%;
-            height: 100%;
-            background: #000;
-            overflow: hidden;
-            position: relative;
-            font-size: 0.8rem; /* Smaller font for computer screen */
-        }
-
-        .screen {
-            width: 100%;
-            height: 100%;
+        body::after {
+            content: " ";
+            display: block;
             position: absolute;
             top: 0;
             left: 0;
-            transition: opacity 0.3s, transform 0.3s;
-            display: flex;
-            flex-direction: column;
-        }
-        .screen.hidden {
-            opacity: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(rgba(18, 18, 18, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            z-index: 2;
             pointer-events: none;
-            transform: scale(0.95);
-            display: none;
+            animation: scanline 10s linear infinite;
+        }
+        @keyframes scanline {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100vh; }
         }
 
-        #lock-screen {
-            background: linear-gradient(135deg, #0f0, #0a0, #050);
-            color: white;
-            justify-content: space-between;
-            align-items: center;
-            padding: 80px 20px;
-            z-index: 50;
+        .terminal-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: 50px 1fr 40px;
+            height: 100vh;
+            gap: 8px;
+            padding: 8px;
         }
-
-        .app-icon {
+        @media (min-width: 1024px) {
+            .terminal-grid {
+                grid-template-columns: 240px 1fr;
+                grid-template-rows: 50px 1fr 40px;
+            }
+        }
+        .panel {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            text-align: center;
-            color: #d1fae5;
-            font-size: 12px;
-            gap: 8px;
-            cursor: pointer;
-            transition: transform 0.2s;
+            transition: box-shadow 0.3s ease;
         }
-        .app-icon:hover {
-            transform: scale(1.1);
-            color: #a7f3d0;
+        .panel-header {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 700;
+            color: var(--text-primary);
+            background-color: #232d41;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
         }
-        .app-icon div {
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        .panel.active > .panel-header {
+            color: white;
+            background-color: var(--accent-blue);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
         }
-        
-        #terminal-output {
-            white-space: pre-wrap;
-            word-break: break-all;
-            color: #4ade80;
+        .panel-content {
+            padding: 16px;
+            overflow-y: auto;
+            flex-grow: 1;
         }
-        #terminal-input::placeholder {
-            color: #4ade80;
-        }
+        .panel-content::-webkit-scrollbar { width: 8px; }
+        .panel-content::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        .panel-content::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        .panel-content::-webkit-scrollbar-thumb:hover { background: #6b7280; }
 
-        #tic-tac-toe-board {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-        .tic-cell {
-            width: 70px;
-            height: 70px;
-            background: #1e3a8a;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            color: #a7f3d0;
-        }
-        .tic-cell[data-player="X"] { color: #60a5fa; }
-        .tic-cell[data-player="O"] { color: #f87171; }
-        
-        #snakes-board {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            grid-template-rows: repeat(10, 1fr);
-            width: 280px;
-            height: 280px;
+        .ticker-tape {
+            white-space: nowrap;
+            overflow: hidden;
             position: relative;
         }
-        .snake-cell {
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            border: 1px solid rgba(0, 255, 0, 0.1);
-            background-color: rgba(0, 50, 0, 0.2);
+        .ticker-tape .ticker-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 45s linear infinite;
         }
-        .snake-cell:nth-child(even) { background-color: rgba(0, 70, 0, 0.3); }
-        #player-piece {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: #a7f3d0;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            transition: all 0.5s ease-in-out;
-            z-index: 5;
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
         }
+        .stock-up { color: var(--accent-green); }
+        .stock-down { color: #ef4444; }
 
-        .info-section h1 { color: #a7f3d0; transition: text-shadow 0.3s ease-in-out, color 0.3s ease-in-out; }
-        .info-section h1:hover { color: #e0f2f7; text-shadow: 0 0 10px rgba(167, 243, 208, 0.8), 0 0 20px rgba(167, 243, 208, 0.6); }
-        .info-section p.title { color: #6ee7b7; }
-        .info-section h2 { color: #a7f3d0; border-bottom-color: #34d399; }
-        .info-section .tag { background-color: #1a2e28; color: #6ee7b7; }
+        .command-palette {
+            background-color: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(8px);
+        }
+        .command-item:hover, .command-item.selected {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+        .mobile-nav button.active {
+            color: var(--accent-blue);
+        }
     </style>
 </head>
-<body class="antialiased">
-    <canvas id="matrix-background"></canvas>
+<body>
+    <div class="terminal-grid">
+        <header class="panel lg:col-span-2 flex justify-between items-center px-4">
+            <div class="text-lg font-bold">SR-TERMINAL <span class="text-xs text-gray-500">v1.0</span></div>
+            <div class="flex items-center gap-4">
+                <div id="clock" class="text-sm hidden md:block"></div>
+                <button id="command-palette-btn" class="text-sm bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded-md transition-colors">
+                    <span class="hidden md:inline">Cmd+K</span>
+                    <svg class="md:hidden w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+                </button>
+            </div>
+        </header>
+        
+        <aside class="panel hidden lg:flex">
+            <div class="panel-header">NAVIGATION</div>
+            <nav class="panel-content p-2 space-y-2">
+                <button data-target="dashboard" class="nav-item w-full text-left bg-blue-600/20 text-white p-2 rounded-md transition-colors">Dashboard</button>
+                <button data-target="projects" class="nav-item w-full text-left hover:bg-gray-700 p-2 rounded-md transition-colors">Projects</button>
+                <button data-target="experience" class="nav-item w-full text-left hover:bg-gray-700 p-2 rounded-md transition-colors">Experience</button>
+                <button data-target="skills" class="nav-item w-full text-left hover:bg-gray-700 p-2 rounded-md transition-colors">Skills & Tools</button>
+                <button data-target="about" class="nav-item w-full text-left hover:bg-gray-700 p-2 rounded-md transition-colors">About Me</button>
+            </nav>
+             <div class="p-4 mt-auto border-t border-gray-700">
+                <a href="https://github.com/shreyanshz24" target="_blank" class="block w-full text-center bg-gray-700 hover:bg-gray-600 p-2 rounded-md mb-2 transition-colors">GitHub</a>
+                <a href="https://www.linkedin.com/in/shreyansh-pratap-singh/" target="_blank" class="block w-full text-center bg-gray-700 hover:bg-gray-600 p-2 rounded-md transition-colors">LinkedIn</a>
+             </div>
+        </aside>
 
-    <main class="min-h-screen grid place-items-center p-4 md:p-8 relative z-10">
-        <div class="container w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            
-            <div class="flex justify-center items-center">
-                <div id="phone-frame" class="frame-container phone hidden">
-                    <div class="phone-inner">
-                        <div class="notch"></div>
+        <main id="main-content-area" class="relative overflow-y-auto lg:overflow-y-hidden">
+            <div id="dashboard-content" class="content-view h-full grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-2 gap-2">
+                <div class="panel lg:row-span-2 active h-[400px] lg:h-auto">
+                    <div class="panel-header flex justify-between items-center">
+                        <span>MARKET SIMULATION [SPY]</span>
+                        <button id="moving-average-btn" class="text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded-md transition-colors">Toggle MA</button>
+                    </div>
+                    <div class="panel-content relative">
+                        <canvas id="financial-chart"></canvas>
                     </div>
                 </div>
-                <div id="computer-frame" class="frame-container computer hidden">
-                    <div class="computer-screen-bezel">
-                        <div class="computer-screen"></div>
-                    </div>
+                <div class="panel active">
+                     <div class="panel-header">STATUS</div>
+                     <div class="panel-content flex flex-col justify-center items-center">
+                        <div class="text-center">
+                            <img src="assets/asdcds.jpg" alt="Shreyansh Pratap Singh" class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-green-500">
+                            <h3 class="font-bold text-lg">Shreyansh Pratap Singh</h3>
+                            <p class="text-sm text-gray-400">Quantitative Developer</p>
+                            <p class="text-sm text-green-400 mt-2">Status: Open to Opportunities</p>
+                        </div>
+                     </div>
+                </div>
+                 <div class="panel active h-[300px] lg:h-auto">
+                    <div class="panel-header">SYSTEM LOG</div>
+                    <div id="system-log" class="panel-content text-xs space-y-1 overflow-y-auto"></div>
                 </div>
             </div>
 
-            <div class="space-y-8 info-section flex flex-col justify-center">
-                <div>
-                    <h1 class="text-5xl md:text-6xl font-black leading-tight">Shreyansh Pratap Singh</h1>
-                    <p class="text-xl md:text-2xl title font-medium">Quantitative Developer & Problem Solver</p>
-                </div>
-                <div class="space-y-4">
-                    <h2 class="text-2xl font-bold border-b-2 pb-2">My Goals</h2>
-                    <p class="leading-relaxed">I'm passionate about leveraging data and algorithms to solve complex financial problems. My goal is to work in a fast-paced quantitative role where I can apply my skills in statistical analysis, machine learning, and software development to create innovative trading strategies and risk management solutions.</p>
-                </div>
-                <div class="space-y-4">
-                    <h2 class="text-2xl font-bold border-b-2 pb-2">Core Skills</h2>
-                    <div class="flex flex-wrap gap-3">
-                        <span class="tag px-3 py-1 rounded-full font-medium">Python</span>
-                        <span class="tag px-3 py-1 rounded-full font-medium">C++</span>
-                        <span class="tag px-3 py-1 rounded-full font-medium">R</span>
-                        <span class="tag px-3 py-1 rounded-full font-medium">Pandas & NumPy</span>
-                        <span class="tag px-3 py-1 rounded-full font-medium">SQL</span>
-                        <span class="tag px-3 py-1 rounded-full font-medium">Machine Learning</span>
-                        <span class="tag px-3 py-1 rounded-full font-medium">Data Structures</span>
-                        <span class="tag px-3 py-1 rounded-full font-medium">Algorithms</span>
-                    </div>
-                </div>
+            <div id="projects-content" class="content-view hidden panel"></div>
+            <div id="experience-content" class="content-view hidden panel"></div>
+            <div id="skills-content" class="content-view hidden panel"></div>
+            <div id="about-content" class="content-view hidden panel"></div>
+        </main>
+
+        <footer class="panel lg:col-span-2">
+            <div class="ticker-tape h-full flex items-center">
+                <div id="ticker-content" class="ticker-content"></div>
             </div>
+        </footer>
+        
+        <nav class="mobile-nav lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-gray-900 border-t border-gray-700 flex justify-around items-center z-20">
+            <button data-target="dashboard" class="nav-item active p-2"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25a2.25 2.25 0 01-2.25-2.25v-2.25z" /></svg></button>
+            <button data-target="projects" class="nav-item p-2"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18M18.75 3v18M9 6.75h6.375M9 12h6.375M9 17.25h6.375" /></svg></button>
+            <button data-target="experience" class="nav-item p-2"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
+            <button data-target="skills" class="nav-item p-2"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" /></svg></button>
+            <button data-target="about" class="nav-item p-2"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z" /></svg></button>
+        </nav>
+    </div>
+    
+    <div id="command-palette" class="fixed inset-0 z-50 hidden items-start justify-center pt-24 command-palette">
+        <div class="w-full max-w-xl bg-gray-800 border border-gray-600 rounded-lg shadow-xl">
+            <input type="text" id="command-input" class="w-full bg-transparent p-4 text-lg text-white placeholder-gray-400 focus:outline-none" placeholder="Type a command or search...">
+            <div id="command-list" class="max-h-80 overflow-y-auto"></div>
         </div>
-    </main>
-
-    <div id="app-screen-storage" class="hidden"></div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
-            const phoneFrame = document.getElementById('phone-frame');
-            const computerFrame = document.getElementById('computer-frame');
-            let activeScreenContainer;
-
-            const screenHTML = `
-                <div id="lock-screen" class="screen"></div>
-                <div id="home-screen" class="screen hidden" style="background: url('https://placehold.co/320x680/1a202c/333333?text=') no-repeat center center / cover;"></div>
-                <div id="projects-app" class="screen hidden bg-gray-900"></div>
-                <div id="about-app" class="screen hidden bg-gray-900"></div>
-                <div id="terminal-app" class="screen hidden bg-black font-mono text-sm"></div>
-                <div id="skills-app" class="screen hidden bg-gray-900"></div>
-                <div id="experience-app" class="screen hidden bg-gray-900"></div>
-                <div id="tools-app" class="screen hidden bg-gray-900"></div>
-                <div id="tic-tac-toe-app" class="screen hidden bg-gray-900 p-4"></div>
-                <div id="snakes-app" class="screen hidden bg-gray-900 p-4 items-center"></div>
-            `;
+            const navItems = document.querySelectorAll('.nav-item');
+            const contentViews = document.querySelectorAll('.content-view');
+            const clockEl = document.getElementById('clock');
+            const commandPalette = document.getElementById('command-palette');
+            const commandPaletteBtn = document.getElementById('command-palette-btn');
+            const commandInput = document.getElementById('command-input');
+            const commandList = document.getElementById('command-list');
+            const systemLog = document.getElementById('system-log');
             
-            document.getElementById('app-screen-storage').innerHTML = screenHTML;
+            const projectsData = [
+                { title: 'Binomial Option Pricer', status: 'Completed', description: 'A high-performance option pricing model for both European and American options, implemented in C++ for maximum speed.', tech: ['C++', 'Financial Modeling', 'Algorithms'] },
+                { title: 'High-Frequency Trading (HFT) Simulator', status: 'In Progress', description: 'Building a low-latency event-driven simulator in C++ to backtest HFT strategies.', tech: ['C++', 'Data Structures', 'Low-Latency Programming'] },
+                { title: 'Vectorised Backtester', status: 'In Progress', description: 'A high-performance trading strategy backtester built in Python, leveraging vectorization with NumPy and Pandas.', tech: ['Python', 'Pandas', 'NumPy', 'Matplotlib'] },
+                { title: 'F1 Race Winner Prediction AI', status: 'In Progress', description: 'An ML model that predicts Formula 1 race winners using scraped historical data and XGBoost.', tech: ['Python', 'Scikit-learn', 'XGBoost', 'Data Scraping'] },
+                { title: 'Real-time Market Data Collector', status: 'In Progress', description: 'A Python script to connect to cryptocurrency exchange APIs and WebSocket streams to collect and store real-time trade and order book data.', tech: ['Python', 'Websockets', 'REST APIs', 'SQL'] },
+                { title: 'Rick Sanchez AI Chatbot', status: 'In Progress', description: 'A fun personal project creating a chatbot that mimics the personality of Rick Sanchez using NLP techniques.', tech: ['Python', 'NLP', 'NLTK'] }
+            ];
 
-            if (isMobile) {
-                phoneFrame.classList.remove('hidden');
-                activeScreenContainer = phoneFrame.querySelector('.phone-inner');
-            } else {
-                computerFrame.classList.remove('hidden');
-                activeScreenContainer = computerFrame.querySelector('.computer-screen');
+            function logToSystem(message, type = 'INFO') {
+                const colors = { 'INFO': 'text-blue-400', 'WARN': 'text-amber-400', 'SUCCESS': 'text-green-400', 'ERROR': 'text-red-400' };
+                const logEntry = document.createElement('p');
+                const timestamp = new Date().toLocaleTimeString();
+                logEntry.innerHTML = `[<span class="text-gray-500">${timestamp}</span>] <span class="${colors[type]}">${type}</span>: ${message}`;
+                systemLog.appendChild(logEntry);
+                systemLog.scrollTop = systemLog.scrollHeight;
             }
-            
-            const screenStorage = document.getElementById('app-screen-storage');
-            while(screenStorage.firstChild) {
-                activeScreenContainer.appendChild(screenStorage.firstChild);
-            }
-            screenStorage.remove();
 
-            const screens = activeScreenContainer.querySelectorAll('.screen');
-            
-            function showScreen(screenId) {
-                screens.forEach(screen => {
-                    if (screen.id === screenId) {
-                        screen.classList.remove('hidden');
+            async function typeLog(message, type = 'INFO') {
+                await new Promise(resolve => setTimeout(resolve, 150));
+                logToSystem(message, type);
+            }
+
+            async function initSequence() {
+                await typeLog('Booting SR-TERMINAL v1.0...');
+                await typeLog('Initializing modules...');
+                await typeLog('Market simulation chart initialized.', 'SUCCESS');
+                await typeLog('Live market ticker started.', 'SUCCESS');
+                await typeLog('Command Palette (Cmd+K) is active.', 'SUCCESS');
+                await typeLog('System ready.', 'SUCCESS');
+            }
+
+            function updateClock() {
+                if(clockEl) clockEl.textContent = new Date().toLocaleString();
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
+
+            function switchView(targetId) {
+                document.querySelectorAll('.panel.active').forEach(p => p.classList.remove('active'));
+                contentViews.forEach(view => {
+                    const parentPanel = view.closest('.panel');
+                    if (view.id === `${targetId}-content`) {
+                        view.classList.remove('hidden');
+                        if (parentPanel) parentPanel.classList.add('active');
                     } else {
-                        screen.classList.add('hidden');
+                        view.classList.add('hidden');
                     }
                 });
+                
+                if (targetId === 'dashboard') {
+                    document.querySelectorAll('#dashboard-content .panel').forEach(p => p.classList.add('active'));
+                }
+
+                navItems.forEach(item => {
+                    if (item.dataset.target === targetId) {
+                        item.classList.add('bg-blue-600/20', 'text-white', 'active');
+                    } else {
+                        item.classList.remove('bg-blue-600/20', 'text-white', 'active');
+                    }
+                });
+                logToSystem(`Mapsd to ${targetId.toUpperCase()} view.`);
+                document.getElementById('main-content-area').scrollTop = 0;
             }
 
-            document.addEventListener('click', (e) => {
-                if (e.target.closest('.app-icon[data-app]')) {
-                    const appId = e.target.closest('.app-icon[data-app]').getAttribute('data-app');
-                    showScreen(`${appId}-app`);
-                }
-                if (e.target.classList.contains('back-button')) {
-                    showScreen('home-screen');
-                }
-                 if (e.target.id === 'unlock-btn') {
-                    showScreen('home-screen');
-                }
+            navItems.forEach(item => {
+                item.addEventListener('click', () => switchView(item.dataset.target));
             });
 
-            function createAppHeader(title) {
-                const header = document.createElement('div');
-                header.className = 'app-screen-header flex-shrink-0 flex items-center p-2 bg-gray-900/50 backdrop-blur-sm';
-                header.innerHTML = `
-                    <button class="back-button text-blue-400 text-sm w-1/4 text-left">&lt; Home</button>
-                    <h2 class="text-base font-bold text-center flex-grow w-1/2 text-white">${title}</h2>
-                    <div class="w-1/4"></div>
-                `;
-                return header;
+            function populateContent() {
+                document.getElementById('projects-content').innerHTML = `<div class="panel-header">PROJECTS</div><div class="panel-content space-y-4">${projectsData.map(p => `<div class="p-3 bg-gray-900 rounded-lg border border-gray-700"><div class="flex justify-between items-start"><h3 class="font-bold text-lg text-green-300">${p.title}</h3><span class="text-xs ${p.status === 'Completed' ? 'bg-green-800 text-green-300' : 'bg-yellow-800 text-yellow-300'} px-2 py-0.5 rounded-full">${p.status}</span></div><p class="text-sm text-gray-400 mt-2">${p.description}</p><div class="mt-3 flex flex-wrap gap-2">${p.tech.map(t => `<span class="tag text-xs px-2 py-1 rounded">${t}</span>`).join('')}</div></div>`).join('')}</div>`;
+                document.getElementById('experience-content').innerHTML = `<div class="panel-header">EXPERIENCE</div><div class="panel-content"><div class="relative pl-10 pb-8"><div class="absolute left-0 top-1 h-4 w-4 rounded-full bg-blue-500 border-2 border-gray-900"></div><div class="absolute left-[7px] top-5 h-full w-0.5 bg-gray-700"></div><h4 class="font-bold text-blue-300">Self-Employed | Independent Researcher & Developer</h4><p class="text-sm text-gray-400">Personal Projects | 2023 - Present</p><ul class="mt-2 ml-4 list-disc text-sm text-gray-400 space-y-1"><li>Implemented a high-performance Binomial Option Pricer in C++.</li><li>Architecting a low-latency HFT simulator in C++.</li><li>Developing a high-performance vectorised backtesting engine in Python.</li><li>Building an F1 race prediction model using XGBoost.</li><li>Creating real-time data ingestion pipelines using Websockets and APIs.</li></ul></div></div>`;
+                document.getElementById('skills-content').innerHTML = `<div class="panel-header">SKILLS & TOOLS</div><div class="panel-content space-y-6"><div><h3 class="text-lg font-semibold text-green-400 mb-3">Programming Languages</h3><div class="flex flex-wrap gap-3">${['Python', 'C++', 'JavaScript', 'R', 'SQL'].map(s => `<span class="tag px-3 py-1 rounded-full">${s}</span>`).join('')}</div></div><div><h3 class="text-lg font-semibold text-green-400 mb-3">Quantitative & ML</h3><div class="flex flex-wrap gap-3">${['Time Series Analysis', 'Options Pricing', 'Backtesting', 'Scikit-learn', 'TensorFlow', 'XGBoost', 'NLP'].map(s => `<span class="tag px-3 py-1 rounded-full">${s}</span>`).join('')}</div></div><div><h3 class="text-lg font-semibold text-green-400 mb-3">Tools & Platforms</h3><div class="flex flex-wrap gap-3">${['Pandas', 'NumPy', 'Jupyter', 'Git', 'Docker', 'CMake'].map(s => `<span class="tag px-3 py-1 rounded-full">${s}</span>`).join('')}</div></div></div>`;
+                document.getElementById('about-content').innerHTML = `<div class="panel-header">ABOUT ME</div><div class="panel-content text-center flex flex-col justify-center items-center"><img src="assets/asdcds.jpg" alt="Shreyansh Pratap Singh" class="w-32 h-32 rounded-full mx-auto mb-6 border-4 border-blue-500"><p class="max-w-prose">A developer who loves turning complex problems into elegant software. Always excited for new challenges, I'm here to make your ideas come to life. Let's build something awesome together!</p></div>`;
             }
             
-            (function initLockAndHome() {
-                const lockScreen = activeScreenContainer.querySelector('#lock-screen');
-                lockScreen.innerHTML = `
-                    <div class="text-center">
-                        <div id="time" class="text-6xl font-bold"></div>
-                        <div id="date" class="text-lg"></div>
-                    </div>
-                    <button id="unlock-btn" class="text-lg font-medium text-white hover:text-green-300 transition-colors">Click to Unlock</button>
-                `;
+            (function initChart() {
+                const ctx = document.getElementById('financial-chart');
+                if (!ctx) return;
+                const chartCtx = ctx.getContext('2d');
+                let data = Array.from({length: 100}, () => 150 + Math.random() * 20 - 10);
+                const labels = Array.from({length: 100}, (_, i) => i);
                 
-                const homeScreen = activeScreenContainer.querySelector('#home-screen');
-                homeScreen.innerHTML = `
-                    <div class="p-4 pt-10 grid grid-cols-4 gap-y-6">
-                        <button data-app="projects" class="app-icon"><div class="bg-amber-600"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div><span>Projects</span></button>
-                        <button data-app="about" class="app-icon"><div class="bg-rose-600"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div><span>About Me</span></button>
-                        <button data-app="terminal" class="app-icon"><div class="bg-gray-700"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg></div><span>Terminal</span></button>
-                        <button data-app="skills" class="app-icon"><div class="bg-cyan-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></div><span>Skills</span></button>
-                        <button data-app="experience" class="app-icon"><div class="bg-lime-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg></div><span>Experience</span></button>
-                        <button data-app="tools" class="app-icon"><div class="bg-purple-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M6 1a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V2a1 1 0 00-1-1H6zm1 2h6v1H7V3z" /></svg></div><span>Tools</span></button>
-                        <div class="app-icon"></div><div class="app-icon"></div>
-                        <button data-app="tic-tac-toe" class="app-icon"><div class="bg-indigo-700"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M21 3L3 21"/><path d="M21 21L3 3"/></svg></div><span>Tic Tac Toe</span></button>
-                        <button data-app="snakes" class="app-icon"><div class="bg-emerald-700"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11.5 12.5 7 7"/><path d="m14 19.5.5-1.5-1.5.5-1-1-.5 1.5 1.5-.5Z"/><path d="m8.5 15.5 7-7"/><path d="m11 12.5.5-1.5-1.5.5-1-1-.5 1.5 1.5-.5Z"/><path d="m5.5 8.5 7-7"/><path d="m8 5.5.5-1.5-1.5.5-1-1-.5 1.5 1.5-.5Z"/></svg></div><span>Snakes</span></button>
-                        <a href="https://www.linkedin.com/in/shreyansh-pratap-singh/" target="_blank" class="app-icon"><div class="bg-blue-600"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></div><span>LinkedIn</span></a>
-                        <a href="https://github.com/shreyanshz24" target="_blank" class="app-icon"><div class="bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.91 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></div><span>GitHub</span></a>
-                    </div>
-                `;
-                 // Re-select time/date elements after they're added to the DOM
-                const timeEl = activeScreenContainer.querySelector('#time');
-                const dateEl = activeScreenContainer.querySelector('#date');
-                const unlockBtn = activeScreenContainer.querySelector('#unlock-btn');
-
-                function updateTime() {
-                    const now = new Date();
-                    if(timeEl) timeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-                    if(dateEl) dateEl.textContent = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+                function calculateMovingAverage(data, windowSize) {
+                    let result = new Array(data.length).fill(null);
+                    for (let i = windowSize - 1; i < data.length; i++) {
+                        let sum = 0;
+                        for (let j = 0; j < windowSize; j++) { sum += data[i - j]; }
+                        result[i] = sum / windowSize;
+                    }
+                    return result;
                 }
-                updateTime();
-                setInterval(updateTime, 60000);
+                
+                const chart = new Chart(chartCtx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { label: 'SPY Price', data: data, borderColor: 'rgba(59, 130, 246, 0.8)', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1, pointRadius: 0 },
+                            { label: '20-Day MA', data: calculateMovingAverage(data, 20), borderColor: 'rgba(245, 158, 11, 0.8)', fill: false, tension: 0.1, pointRadius: 0, hidden: true }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: false }, y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } } }, plugins: { legend: { labels: { color: 'white' } } } }
+                });
+
+                document.getElementById('moving-average-btn').addEventListener('click', () => {
+                    chart.data.datasets[1].hidden = !chart.data.datasets[1].hidden;
+                    chart.update();
+                    logToSystem(`Toggled 20-Day MA ${chart.data.datasets[1].hidden ? 'OFF' : 'ON'}.`, 'WARN');
+                });
+                
+                setInterval(() => {
+                    const lastValue = data[data.length - 1];
+                    const newValue = lastValue + (Math.random() - 0.5) * 2;
+                    data.push(newValue);
+                    data.shift();
+                    chart.data.datasets[0].data = data;
+                    chart.data.datasets[1].data = calculateMovingAverage(data, 20);
+                    chart.update('quiet');
+                    logToSystem(`New tick received: SPY @ ${newValue.toFixed(2)}`);
+                }, 2000);
+
             })();
 
-            const fullAppInitializers = [
-                initProjectsApp, initAboutApp, initSkillsApp, initExperienceApp, initToolsApp, initTerminal, initTicTacToe, initSnakesAndLadders
-            ];
-
-            fullAppInitializers.forEach(init => init(activeScreenContainer));
+            (function initTicker() {
+                const tickerContent = document.getElementById('ticker-content');
+                const stocks = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'NVDA', 'SPY', 'QQQ', 'BTC-USD', 'ETH-USD'];
+                let tickerHTML = '';
+                stocks.forEach(stock => {
+                    const change = (Math.random() * 5 - 2.5).toFixed(2);
+                    const isUp = change >= 0;
+                    tickerHTML += `<span class="mx-4">${stock} <span class="${isUp ? 'stock-up' : 'stock-down'}">${isUp ? '+' : ''}${change}%</span></span>`;
+                });
+                tickerContent.innerHTML = tickerHTML.repeat(4);
+            })();
             
-            initMatrixBackground();
+            (function initCommandPalette() {
+                const commands = [
+                    { name: 'Navigate: Dashboard', action: () => switchView('dashboard') },
+                    { name: 'Navigate: Projects', action: () => switchView('projects') },
+                    { name: 'Navigate: Experience', action: () => switchView('experience') },
+                    { name: 'Navigate: Skills & Tools', action: () => switchView('skills') },
+                    { name: 'Navigate: About Me', action: () => switchView('about') },
+                    { name: 'Open: GitHub', action: () => window.open('https://github.com/shreyanshz24', '_blank') },
+                    { name: 'Open: LinkedIn', action: () => window.open('https://www.linkedin.com/in/shreyansh-pratap-singh/', '_blank') },
+                ];
+                function openPalette() { logToSystem('Command Palette opened.', 'WARN'); commandPalette.classList.remove('hidden'); commandPalette.classList.add('flex'); commandInput.focus(); renderCommands(); }
+                function closePalette() { commandPalette.classList.add('hidden'); commandPalette.classList.remove('flex'); commandInput.value = ''; }
+                function renderCommands(filter = '') {
+                    commandList.innerHTML = '';
+                    const filteredCommands = commands.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
+                    filteredCommands.forEach((cmd, index) => {
+                        const item = document.createElement('div');
+                        item.className = 'command-item p-3 cursor-pointer';
+                        if(index === 0) item.classList.add('selected');
+                        item.textContent = cmd.name;
+                        item.onclick = () => { cmd.action(); closePalette(); logToSystem(`Executed command: ${cmd.name}`); };
+                        commandList.appendChild(item);
+                    });
+                }
+                commandPaletteBtn.addEventListener('click', openPalette);
+                window.addEventListener('keydown', e => {
+                    if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openPalette(); }
+                    if (e.key === 'Escape' && !commandPalette.classList.contains('hidden')) closePalette();
+                });
+                commandPalette.addEventListener('click', (e) => { if(e.target === commandPalette) closePalette() });
+                commandInput.addEventListener('input', () => renderCommands(commandInput.value));
+            })();
+
+            populateContent();
+            initSequence();
         });
-
-        // ALL init functions are now defined globally
-        function initMatrixBackground() {
-            const canvas = document.getElementById('matrix-background');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            const matrixChars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+-=[]{}|;:,.<>?';
-            const fontSize = 16;
-            const columns = canvas.width / fontSize;
-            const drops = Array(Math.floor(columns)).fill(1);
-            function drawMatrix() {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#0F0';
-                ctx.font = `${fontSize}px 'Space Mono', monospace`;
-                for (let i = 0; i < drops.length; i++) {
-                    const text = matrixChars.charAt(Math.floor(Math.random() * matrixChars.length));
-                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                    drops[i]++;
-                }
-            }
-            setInterval(drawMatrix, 50);
-        }
-
-        function initProjectsApp(container) {
-            const appContainer = container.querySelector('#projects-app');
-            appContainer.innerHTML = '';
-            appContainer.appendChild(createAppHeader('Projects'));
-            const projectListContainer = document.createElement('div');
-            projectListContainer.className = 'flex-grow overflow-y-auto p-4 space-y-4';
-            const projects = [
-                 { title: 'Binomial Option Pricer', status: 'Completed', description: 'A high-performance option pricing model for both European and American options, implemented in C++ for maximum speed. Demonstrates understanding of financial engineering concepts and efficient algorithm design.', tech: ['C++', 'Financial Modeling', 'Algorithms'] },
-                 { title: 'High-Frequency Trading (HFT) Simulator', status: 'In Progress', description: 'Building a low-latency event-driven simulator in C++ to backtest HFT strategies. Focuses on order book management, market micro-structure, and minimizing latency.', tech: ['C++', 'Data Structures', 'Low-Latency Programming'] },
-                 { title: 'Vectorised Backtester', status: 'In Progress', description: 'A high-performance trading strategy backtester built in Python. It leverages vectorization with NumPy and Pandas to eliminate slow loops, allowing for rapid testing of signals on historical data.', tech: ['Python', 'Pandas', 'NumPy', 'Matplotlib'] },
-                 { title: 'F1 Race Winner Prediction AI', status: 'In Progress', description: 'A machine learning model that predicts Formula 1 race winners. Involved scraping historical data, extensive feature engineering (driver, circuit, and constructor stats), and model tuning.', tech: ['Python', 'Scikit-learn', 'XGBoost', 'Data Scraping'] },
-                 { title: 'Real-time Market Data Collector', status: 'In Progress', description: 'Developing a Python script to connect to cryptocurrency exchange APIs and WebSocket streams to collect and store real-time trade and order book data for analysis.', tech: ['Python', 'Websockets', 'REST APIs', 'SQL'] },
-                 { title: 'Rick Sanchez AI Chatbot', status: 'In Progress', description: 'A fun personal project creating a chatbot that mimics the personality and speech patterns of Rick Sanchez using NLP techniques and a custom dataset.', tech: ['Python', 'NLP', 'NLTK'] }
-            ];
-            projects.forEach(project => {
-                const projectEl = document.createElement('div');
-                projectEl.className = 'p-3 bg-gray-800 rounded-lg';
-                projectEl.innerHTML = `<div class="flex justify-between items-start"><h3 class="font-bold text-green-300">${project.title}</h3><span class="text-xs ${project.status === 'Completed' ? 'bg-green-800 text-green-300' : 'bg-yellow-800 text-yellow-300'} px-2 py-0.5 rounded-full">${project.status}</span></div><p class="text-sm text-gray-400 mt-1">${project.description}</p><div class="mt-3 flex flex-wrap gap-2">${project.tech.map(t => `<span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">${t}</span>`).join('')}</div>${project.url ? `<a href="${project.url}" target="_blank" class="text-blue-400 text-sm mt-3 inline-block hover:underline">View on GitHub &rarr;</a>` : ''}`;
-                projectListContainer.appendChild(projectEl);
-            });
-            appContainer.appendChild(projectListContainer);
-        }
-
-        function initAboutApp(container) {
-            const appContainer = container.querySelector('#about-app');
-            appContainer.innerHTML = '';
-            appContainer.appendChild(createAppHeader('About Me'));
-            const contentContainer = document.createElement('div');
-            contentContainer.className = 'flex-grow overflow-y-auto p-4 flex flex-col items-center text-center space-y-4';
-            contentContainer.innerHTML = `<div class="p-2 bg-gray-700 rounded-full"><img src="assets/asdcds.jpg" alt="Shreyansh Pratap Singh" class="w-32 h-32 rounded-full object-cover"></div><div><h3 class="text-xl font-bold text-green-300">👋 Hey there! I'm Shreyansh.</h3></div><p class="text-sm text-gray-300 leading-relaxed px-2">A developer who loves turning complex problems into elegant software. Always excited for new challenges, I'm here to make your ideas come to life. Let's build something awesome together!</p>`;
-            appContainer.appendChild(contentContainer);
-        }
-
-        function initSkillsApp(container) {
-            const appContainer = container.querySelector('#skills-app');
-            appContainer.innerHTML = '';
-            appContainer.appendChild(createAppHeader('Skills'));
-            const contentContainer = document.createElement('div');
-            contentContainer.className = 'flex-grow overflow-y-auto p-4 space-y-6';
-            contentContainer.innerHTML = `<div><h3 class="text-lg font-semibold text-green-400 mb-3">Programming Languages</h3><div class="flex flex-wrap gap-3"><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Python</span><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">C++</span><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">JavaScript</span><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">R</span><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">SQL</span></div></div><div><h3 class="text-lg font-semibold text-green-400 mb-3">Quantitative & Financial Modeling</h3><div class="flex flex-wrap gap-3"><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Statistical Analysis</span><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Time Series Analysis</span><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Options Pricing Theory</span><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Algorithmic Trading Concepts</span><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Backtesting</span></div></div><div><h3 class="text-lg font-semibold text-green-400 mb-3">Machine Learning & AI</h3><div class="flex flex-wrap gap-3"><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Scikit-learn</span><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">TensorFlow & Keras</span><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">XGBoost</span><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">LSTMs</span><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">NLP</span></div></div><div><h3 class="text-lg font-semibold text-green-400 mb-3">Data, Web & Backend</h3><div class="flex flex-wrap gap-3"><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Pandas & NumPy</span><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Node.js</span><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">React</span><span class="bg-gray-800 text-gray-300 text-sm font-medium px-3 py-1 rounded-full">Websockets</span></div></div>`;
-            appContainer.appendChild(contentContainer);
-        }
-
-        function initExperienceApp(container) {
-            const appContainer = container.querySelector('#experience-app');
-            appContainer.innerHTML = '';
-            appContainer.appendChild(createAppHeader('Experience'));
-            const contentContainer = document.createElement('div');
-            contentContainer.className = 'flex-grow overflow-y-auto p-6';
-            contentContainer.innerHTML = `<div class="relative"><div class="absolute left-4 top-4 h-full w-0.5 bg-gray-700"></div><div class="relative pl-10 pb-8"><div class="absolute left-0 top-4 h-8 w-8 rounded-full bg-green-500 border-4 border-gray-900 flex items-center justify-center"><div class="h-2 w-2 rounded-full bg-white"></div></div><h4 class="font-bold text-green-300">Self-Employed | Independent Researcher & Developer</h4><p class="text-sm text-gray-400">Personal Projects</p><p class="text-xs text-gray-500">2023 - Present</p><ul class="mt-2 ml-4 list-disc text-sm text-gray-400 space-y-1"><li>Implemented a high-performance Binomial Option Pricer in C++ for American & European options.</li><li>Architecting a low-latency HFT simulator in C++.</li><li>Developing a high-performance vectorised backtesting engine in Python.</li><li>Building an F1 race prediction model using XGBoost.</li><li>Creating real-time data ingestion pipelines using Websockets and APIs.</li></ul></div></div>`;
-            appContainer.appendChild(contentContainer);
-        }
-
-        function initToolsApp(container) {
-            const appContainer = container.querySelector('#tools-app');
-            appContainer.innerHTML = '';
-            appContainer.appendChild(createAppHeader('Tools'));
-            const contentContainer = document.createElement('div');
-            contentContainer.className = 'flex-grow overflow-y-auto p-4 space-y-6';
-            contentContainer.innerHTML = `<div class="bg-gray-800 p-4 rounded-lg"><h4 class="font-bold text-green-300 mb-2">Development & Version Control</h4><p class="text-sm text-gray-400">VS Code is my primary editor, paired with Git & GitHub for version control. I use CMake for managing C++ projects.</p></div><div class="bg-gray-800 p-4 rounded-lg"><h4 class="font-bold text-green-300 mb-2">Data Science & ML</h4><p class="text-sm text-gray-400">I use Jupyter Notebooks for research and prototyping. Key libraries include Pandas, NumPy, Matplotlib, Scikit-learn, and TensorFlow/PyTorch.</p></div><div class="bg-gray-800 p-4 rounded-lg"><h4 class="font-bold text-green-300 mb-2">Productivity</h4><p class="text-sm text-gray-400">Notion is my digital brain for organizing project ideas, tracking progress, and taking notes.</p></div>`;
-            appContainer.appendChild(contentContainer);
-        }
-
-        function initTerminal(container) {
-            const appContainer = container.querySelector('#terminal-app');
-            appContainer.innerHTML = '';
-            appContainer.appendChild(createAppHeader('Terminal'));
-            const terminalContainer = document.createElement('div');
-            terminalContainer.className = 'flex-grow flex flex-col overflow-y-auto pt-2';
-            terminalContainer.innerHTML = `<div id="terminal-output" class="flex-grow text-green-400"></div><div class="flex items-center"><span class="text-green-400">~/portfolio $</span><input id="terminal-input" type="text" class="bg-transparent border-none text-green-400 focus:ring-0 flex-grow ml-2" placeholder="type 'help'..."></div>`;
-            appContainer.appendChild(terminalContainer);
-            const outputEl = terminalContainer.querySelector('#terminal-output');
-            const inputEl = terminalContainer.querySelector('#terminal-input');
-            const projects = { 'hft-simulator': {}, 'vectorised-backtester': {}, 'f1-predictor': {}, 'market-data-collector': {}, 'rick-sanchez-bot': {} };
-            function printToTerminal(text) {
-                outputEl.innerHTML += `${text}\n`;
-                outputEl.scrollTop = outputEl.scrollHeight;
-            }
-            printToTerminal('Welcome! Type `help` for commands.');
-            inputEl.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    const command = inputEl.value.trim().toLowerCase();
-                    printToTerminal(`\n<span class="text-green-400">~/portfolio $</span> ${command}`);
-                    inputEl.value = '';
-                    const [cmd, ...args] = command.split(' ');
-                    switch (cmd) {
-                        case 'help': printToTerminal(`Commands: help, about, ls, open [proj], github, linkedin, clear`); break;
-                        case 'about': printToTerminal('Quant developer interested in HFT, ML, and algorithmic trading.'); break;
-                        case 'ls': printToTerminal(`Projects:\n  ${Object.keys(projects).join('\n  ')}`); break;
-                        case 'github': window.open('https://github.com/shreyanshz24', '_blank'); break;
-                        case 'linkedin': window.open('https://www.linkedin.com/in/shreyansh-pratap-singh/', '_blank'); break;
-                        case 'clear': outputEl.innerHTML = ''; break;
-                        default: printToTerminal(`Command not found: ${command}.`);
-                    }
-                }
-            });
-        }
-
-        function initTicTacToe(container) {
-            const appContainer = container.querySelector('#tic-tac-toe-app');
-            appContainer.innerHTML = '';
-            appContainer.appendChild(createAppHeader('Tic Tac Toe'));
-            const gameContainer = document.createElement('div');
-            gameContainer.className = 'flex-grow flex flex-col items-center justify-center space-y-4';
-            gameContainer.innerHTML = `<div id="tic-status" class="text-xl font-medium text-green-300">X's Turn</div><div id="tic-tac-toe-board" class="bg-gray-800 p-3 rounded-lg"></div><button id="tic-reset" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors">Reset</button>`;
-            appContainer.appendChild(gameContainer);
-            const boardEl = gameContainer.querySelector('#tic-tac-toe-board');
-            const statusEl = gameContainer.querySelector('#tic-status');
-            const resetBtn = gameContainer.querySelector('#tic-reset');
-            let board = ['', '', '', '', '', '', '', '', ''], currentPlayer = 'X', gameActive = true;
-            const winningConditions = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
-            function handleResultValidation() {
-                let roundWon = winningConditions.some(c => board[c[0]] && board[c[0]] === board[c[1]] && board[c[0]] === board[c[2]]);
-                if (roundWon) { statusEl.textContent = `Player ${currentPlayer} has won!`; gameActive = false; return; }
-                if (!board.includes('')) { statusEl.textContent = `Game ended in a draw!`; gameActive = false; return; }
-                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-                statusEl.textContent = `${currentPlayer}'s Turn`;
-            }
-            boardEl.innerHTML = board.map((_, i) => `<div class="tic-cell" data-index="${i}"></div>`).join('');
-            boardEl.addEventListener('click', e => {
-                const cell = e.target;
-                const index = cell.getAttribute('data-index');
-                if (board[index] !== '' || !gameActive) return;
-                board[index] = currentPlayer;
-                cell.textContent = currentPlayer;
-                cell.setAttribute('data-player', currentPlayer);
-                handleResultValidation();
-            });
-            resetBtn.addEventListener('click', () => {
-                board = ['', '', '', '', '', '', '', '', '']; gameActive = true; currentPlayer = 'X'; statusEl.textContent = `X's Turn`;
-                boardEl.querySelectorAll('.tic-cell').forEach(c => { c.textContent = ''; c.removeAttribute('data-player'); });
-            });
-        }
-        
-        function initSnakesAndLadders(container) {
-            const appContainer = container.querySelector('#snakes-app');
-            appContainer.innerHTML = '';
-            appContainer.appendChild(createAppHeader('Snakes & Ladders'));
-            const gameContainer = document.createElement('div');
-            gameContainer.className = 'flex-grow flex flex-col items-center justify-center space-y-3';
-            gameContainer.innerHTML = `<div id="snakes-board"></div><div id="snakes-status" class="font-medium text-center text-green-300">Roll the dice to start!</div><button id="roll-dice" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg text-lg font-bold transition-colors">Roll Dice</button>`;
-            appContainer.appendChild(gameContainer);
-            const boardEl = gameContainer.querySelector('#snakes-board');
-            const playerPieceEl = document.createElement('div');
-            playerPieceEl.id = 'player-piece';
-            let cellsHTML = '';
-            for (let i = 100; i >= 1; i--) {
-                cellsHTML += `<div class="snake-cell">${i}</div>`;
-            }
-            boardEl.innerHTML = cellsHTML;
-            boardEl.appendChild(playerPieceEl);
-            const statusEl = gameContainer.querySelector('#snakes-status');
-            const rollBtn = gameContainer.querySelector('#roll-dice');
-            const snakes = {17:7,54:34,62:19,64:60,87:24,93:73,95:75,99:78}, ladders = {4:14,9:31,20:38,28:84,40:59,51:67,63:81,71:91};
-            let playerPosition = 0;
-            function updatePlayerPositionOnBoard() {
-                if (playerPosition === 0) { playerPieceEl.style.display = 'none'; return; }
-                playerPieceEl.style.display = 'block';
-                const row = 9 - Math.floor((playerPosition - 1) / 10);
-                let col = (playerPosition - 1) % 10;
-                if (row % 2 !== 1) col = 9 - col;
-                playerPieceEl.style.left = `${col * 28 + 4}px`;
-                playerPieceEl.style.top = `${row * 28 + 4}px`;
-            }
-            rollBtn.addEventListener('click', () => {
-                if(rollBtn.textContent === 'Play Again') {
-                    playerPosition = 0; updatePlayerPositionOnBoard(); statusEl.textContent = "Roll to start!"; rollBtn.textContent = "Roll Dice"; return;
-                }
-                if (playerPosition >= 100) return;
-                const roll = Math.floor(Math.random() * 6) + 1;
-                let newPos = playerPosition + roll;
-                if (newPos > 100) { statusEl.innerHTML = `You rolled a ${roll}.<br>Need to land exactly on 100!`; return; }
-                playerPosition = newPos;
-                statusEl.innerHTML = `You rolled a ${roll} & moved to ${playerPosition}.`;
-                updatePlayerPositionOnBoard();
-                setTimeout(() => {
-                    if (snakes[playerPosition]) { playerPosition = snakes[playerPosition]; statusEl.innerHTML += `<br><span class="text-red-400">Snake! Down to ${playerPosition}.</span>`; }
-                    else if (ladders[playerPosition]) { playerPosition = ladders[playerPosition]; statusEl.innerHTML += `<br><span class="text-blue-400">Ladder! Up to ${playerPosition}.</span>`; }
-                    updatePlayerPositionOnBoard();
-                    if (playerPosition === 100) { statusEl.innerHTML = "<span class='text-yellow-400'>You won!</span>"; rollBtn.textContent = 'Play Again'; }
-                }, 600);
-            });
-            updatePlayerPositionOnBoard();
-        }
-        
-        function createAppHeader(title) {
-            const header = document.createElement('div');
-            header.className = 'app-screen-header flex-shrink-0 flex items-center p-2 bg-gray-900/70 backdrop-blur-sm z-10';
-            header.innerHTML = `
-                <button class="back-button text-blue-400 text-sm w-1/4 text-left">&lt; Home</button>
-                <h2 class="text-base font-bold text-center flex-grow w-1/2 text-white">${title}</h2>
-                <div class="w-1/4"></div>
-            `;
-            return header;
-        }
     </script>
 </body>
 </html>
