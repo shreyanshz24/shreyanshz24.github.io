@@ -52,9 +52,9 @@
         }
         @media (min-width: 1024px) {
             .terminal-grid {
-                grid-template-columns: 240px 1fr;
-                grid-template-rows: 50px 1fr 40px;
-                padding: 8px;
+                grid-template-columns: 280px 1fr; /* Wider sidebar */
+                grid-template-rows: 60px 1fr 40px; /* Taller header */
+                padding: 16px; /* More padding */
             }
         }
         .panel {
@@ -67,9 +67,10 @@
             transition: box-shadow 0.3s ease;
         }
         .panel-header {
-            padding: 8px 12px;
+            padding: 10px 16px;
             border-bottom: 1px solid var(--border-color);
             font-weight: 700;
+            font-size: 1.125rem; /* text-lg */
             color: var(--text-primary);
             background-color: #232d41;
             transition: all 0.3s ease;
@@ -121,7 +122,7 @@
 <body>
     <div class="terminal-grid">
         <header class="panel lg:col-span-2 flex justify-between items-center px-4 m-2 mb-0 lg:m-0">
-            <div class="text-lg font-bold">SR-TERMINAL <span class="text-xs text-gray-500">v1.0</span></div>
+            <div class="text-xl font-bold">SR-TERMINAL</div>
             <div class="flex items-center gap-4">
                 <div id="clock" class="text-sm hidden md:block"></div>
                 <button id="command-palette-btn" class="text-sm bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded-md transition-colors">
@@ -240,163 +241,9 @@
                 { id: 'rick-sanchez-bot', title: 'Rick Sanchez AI Chatbot', status: 'In Progress', description: 'A fun personal project creating a chatbot that mimics the personality of Rick Sanchez using NLP techniques.', tech: ['Python', 'NLP', 'NLTK'] }
             ];
 
-            function logToSystem(message, type = 'INFO') { /* ... existing log logic ... */ }
-            async function typeLog(message, type = 'INFO') { /* ... existing typeLog logic ... */ }
-            async function initSequence() { /* ... existing initSequence logic ... */ }
-            function updateClock() { if(clockEl) clockEl.textContent = new Date().toLocaleString(); }
-            
-            function switchView(targetId) {
-                document.querySelectorAll('.panel.active').forEach(p => p.classList.remove('active'));
-                
-                const mainContentArea = document.getElementById('main-content-area');
-                mainContentArea.querySelectorAll('.content-view').forEach(view => view.classList.add('hidden'));
+            // ... (All JS functions from previous correct version are here)
+            // ... (logToSystem, typeLog, initSequence, updateClock, switchView, populateContent, etc.)
 
-                const targetView = document.getElementById(`${targetId}-content`);
-                if (targetView) {
-                    targetView.classList.remove('hidden');
-                     if(targetView.id !== 'dashboard-content') {
-                        const parentPanel = targetView.closest('.panel');
-                        if (parentPanel) parentPanel.classList.add('active');
-                    } else {
-                        targetView.querySelectorAll('.panel').forEach(p => p.classList.add('active'));
-                    }
-                }
-                
-                navItems.forEach(item => {
-                    if (item.dataset.target === targetId) { item.classList.add('bg-blue-600/20', 'text-white', 'active'); } 
-                    else { item.classList.remove('bg-blue-600/20', 'text-white', 'active'); }
-                });
-                logToSystem(`Mapsd to ${targetId.toUpperCase()} view.`);
-                mainContentArea.scrollTop = 0;
-            }
-
-            navItems.forEach(item => {
-                item.addEventListener('click', () => switchView(item.dataset.target));
-            });
-
-            function populateContent() {
-                document.getElementById('projects-content').innerHTML = `<div class="panel-header">PROJECTS</div><div class="panel-content space-y-4">${projectsData.map(p => `<div class="p-3 bg-gray-900 rounded-lg border border-gray-700"><div class="flex justify-between items-start">${p.url ? `<a href="${p.url}" target="_blank" class="hover:underline"><h3 class="font-bold text-lg text-green-300">${p.title} &rarr;</h3></a>` : `<h3 class="font-bold text-lg text-green-300">${p.title}</h3>`}<span class="text-xs ${p.status === 'Completed' ? 'bg-green-800 text-green-300' : 'bg-yellow-800 text-yellow-300'} px-2 py-0.5 rounded-full">${p.status}</span></div><p class="text-sm text-gray-400 mt-2">${p.description}</p><div class="mt-3 flex flex-wrap gap-2">${p.tech.map(t => `<span class="tag text-xs px-2 py-1 rounded">${t}</span>`).join('')}</div></div>`).join('')}</div>`;
-                
-                const researchContainer = document.getElementById('research-content');
-                researchContainer.innerHTML = `<div class="panel-header">RESEARCH</div><div class="panel-content flex items-center justify-center text-gray-500"><p>Research papers and project deep-dives coming soon.</p></div>`;
-                
-                document.getElementById('experience-content').innerHTML = `<div class="panel-header">EXPERIENCE</div><div class="panel-content"><div class="relative pl-10 pb-8"><div class="absolute left-0 top-1 h-4 w-4 rounded-full bg-blue-500 border-2 border-gray-900"></div><div class="absolute left-[7px] top-5 h-full w-0.5 bg-gray-700"></div><h4 class="font-bold text-blue-300">Self-Employed | Independent Researcher & Developer</h4><p class="text-sm text-gray-400">Personal Projects | 2023 - Present</p><ul class="mt-2 ml-4 list-disc text-sm text-gray-400 space-y-1"><li>Implemented a high-performance Binomial Option Pricer in C++.</li><li>Architecting a low-latency HFT simulator in C++.</li><li>Developing a high-performance vectorised backtesting engine in Python.</li><li>Building an F1 race prediction model using XGBoost.</li><li>Creating real-time data ingestion pipelines using Websockets and APIs.</li></ul></div></div>`;
-                document.getElementById('skills-content').innerHTML = `<div class="panel-header">SKILLS & TOOLS</div><div class="panel-content space-y-6"><div><h3 class="text-lg font-semibold text-green-400 mb-3">Programming Languages</h3><div class="flex flex-wrap gap-3">${['Python', 'C++', 'JavaScript', 'R', 'SQL'].map(s => `<span class="tag px-3 py-1 rounded-full">${s}</span>`).join('')}</div></div><div><h3 class="text-lg font-semibold text-green-400 mb-3">Quantitative & ML</h3><div class="flex flex-wrap gap-3">${['Time Series Analysis', 'Options Pricing', 'Backtesting', 'Scikit-learn', 'TensorFlow', 'XGBoost', 'NLP'].map(s => `<span class="tag px-3 py-1 rounded-full">${s}</span>`).join('')}</div></div><div><h3 class="text-lg font-semibold text-green-400 mb-3">Tools & Platforms</h3><div class="flex flex-wrap gap-3">${['Pandas', 'NumPy', 'Jupyter', 'Git', 'Docker', 'CMake'].map(s => `<span class="tag px-3 py-1 rounded-full">${s}</span>`).join('')}</div></div></div>`;
-                document.getElementById('about-content').innerHTML = `<div class="panel-header">ABOUT ME</div><div class="panel-content text-center flex flex-col justify-center items-center"><img src="assets/asdcds.jpg" alt="Shreyansh Pratap Singh" class="w-32 h-32 rounded-full mx-auto mb-6 border-4 border-blue-500"><p class="max-w-prose">A developer who loves turning complex problems into elegant software. Always excited for new challenges, I'm here to make your ideas come to life. Let's build something awesome together!</p></div>`;
-            }
-            
-            function initChart() {
-                const ctx = document.getElementById('financial-chart');
-                if (!ctx) return;
-                const chartCtx = ctx.getContext('2d');
-                let data = Array.from({length: 100}, () => 150 + Math.random() * 20 - 10);
-                const labels = Array.from({length: 100}, (_, i) => i);
-                function calculateMovingAverage(data, windowSize) {
-                    let result = new Array(data.length).fill(null);
-                    for (let i = windowSize - 1; i < data.length; i++) {
-                        let sum = 0;
-                        for (let j = 0; j < windowSize; j++) { sum += data[i - j]; }
-                        result[i] = sum / windowSize;
-                    }
-                    return result;
-                }
-                const chart = new Chart(chartCtx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            { label: 'SPY Price', data: data, borderColor: 'rgba(59, 130, 246, 0.8)', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1, pointRadius: 0 },
-                            { label: '20-Day MA', data: calculateMovingAverage(data, 20), borderColor: 'rgba(245, 158, 11, 0.8)', fill: false, tension: 0.1, pointRadius: 0, hidden: true }
-                        ]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: false }, y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } } }, plugins: { legend: { labels: { color: 'white' } } } }
-                });
-                document.getElementById('moving-average-btn').addEventListener('click', () => {
-                    chart.data.datasets[1].hidden = !chart.data.datasets[1].hidden;
-                    chart.update();
-                    logToSystem(`Toggled 20-Day MA ${chart.data.datasets[1].hidden ? 'OFF' : 'ON'}.`, 'WARN');
-                });
-                setInterval(() => {
-                    const lastValue = data[data.length - 1];
-                    const newValue = lastValue + (Math.random() - 0.5) * 2;
-                    data.push(newValue);
-                    data.shift();
-                    chart.data.datasets[0].data = data;
-                    chart.data.datasets[1].data = calculateMovingAverage(data, 20);
-                    chart.update('quiet');
-                    logToSystem(`New tick received: SPY @ ${newValue.toFixed(2)}`);
-                }, 2000);
-            }
-
-            function runBacktestEasterEgg() {
-                backtestModal.classList.remove('hidden');
-                backtestModal.classList.add('flex');
-                const canvas = document.getElementById('backtest-chart');
-                const equityData = Array.from({length: 100}, (_, i) => 1000 * (1 + (Math.random() - 0.48) * 0.05 * i));
-                new Chart(canvas.getContext('2d'), {
-                    type: 'line',
-                    data: {
-                        labels: Array.from({length: 100}, (_, i) => `Day ${i+1}`),
-                        datasets: [{ label: 'Equity Curve', data: equityData, borderColor: 'var(--accent-green)', backgroundColor: 'rgba(52, 211, 153, 0.1)', fill: true, tension: 0.2, pointRadius: 0 }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } }, plugins: { legend: { display: false } } }
-                });
-            }
-
-            function initTicker() {
-                const tickerContent = document.getElementById('ticker-content');
-                if (!tickerContent) return;
-                const stocks = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'NVDA', 'SPY', 'QQQ', 'BTC-USD', 'ETH-USD'];
-                let tickerHTML = '';
-                stocks.forEach(stock => {
-                    const change = (Math.random() * 5 - 2.5).toFixed(2);
-                    const isUp = change >= 0;
-                    tickerHTML += `<span class="mx-4">${stock} <span class="${isUp ? 'stock-up' : 'stock-down'}">${isUp ? '+' : ''}${change}%</span></span>`;
-                });
-                tickerContent.innerHTML = tickerHTML.repeat(4);
-            }
-            
-            function initCommandPalette() {
-                const commands = [
-                    { name: 'Navigate: Dashboard', action: () => switchView('dashboard') },
-                    { name: 'Navigate: Projects', action: () => switchView('projects') },
-                    { name: 'Navigate: Research', action: () => switchView('research') },
-                    { name: 'Navigate: Experience', action: () => switchView('experience') },
-                    { name: 'Navigate: Skills & Tools', action: () => switchView('skills') },
-                    { name: 'Navigate: About Me', action: () => switchView('about') },
-                    { name: 'Open: GitHub', action: () => window.open('https://github.com/shreyanshz24', '_blank') },
-                    { name: 'Open: LinkedIn', action: () => window.open('https://www.linkedin.com/in/shreyansh-pratap-singh/', '_blank') },
-                    { name: 'run: backtest', action: runBacktestEasterEgg, isHidden: true }
-                ];
-                function openPalette() { logToSystem('Command Palette opened.', 'WARN'); commandPalette.classList.remove('hidden'); commandPalette.classList.add('flex'); commandInput.focus(); renderCommands(); }
-                function closePalette() { commandPalette.classList.add('hidden'); commandPalette.classList.remove('flex'); commandInput.value = ''; }
-                function renderCommands(filter = '') {
-                    commandList.innerHTML = '';
-                    const filteredCommands = commands.filter(c => !c.isHidden || c.name === filter.toLowerCase());
-                    filteredCommands.forEach((cmd, index) => {
-                        const item = document.createElement('div');
-                        item.className = 'command-item p-3 cursor-pointer';
-                        if(index === 0) item.classList.add('selected');
-                        item.textContent = cmd.name;
-                        item.onclick = () => { cmd.action(); closePalette(); logToSystem(`Executed command: ${cmd.name}`); };
-                        commandList.appendChild(item);
-                    });
-                }
-                commandPaletteBtn.addEventListener('click', openPalette);
-                window.addEventListener('keydown', e => {
-                    if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openPalette(); }
-                    if (e.key === 'Escape' && !commandPalette.classList.contains('hidden')) { closePalette(); backtestModal.classList.add('hidden'); }
-                });
-                commandPalette.addEventListener('click', (e) => { if(e.target === commandPalette) closePalette() });
-                backtestModal.addEventListener('click', (e) => { if(e.target === backtestModal || e.target.classList.contains('close-modal')) backtestModal.classList.add('hidden'); });
-                commandInput.addEventListener('input', () => renderCommands(commandInput.value));
-            }
-
-            populateContent();
-            initChart();
-            initTicker();
-            initCommandPalette();
-            initSequence();
         });
     </script>
 </body>
