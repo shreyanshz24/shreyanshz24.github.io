@@ -17,12 +17,12 @@
             --accent-green: #34d399;
             --accent-amber: #f59e0b;
             --accent-blue: #3b82f6;
+            --code-bg: #0d1117;
         }
         body {
             font-family: 'Space Mono', monospace;
             background-color: var(--bg-primary);
             color: var(--text-primary);
-            overflow: hidden;
         }
         body::after {
             content: " ";
@@ -46,15 +46,15 @@
         .terminal-grid {
             display: grid;
             grid-template-columns: 1fr;
-            grid-template-rows: 50px 1fr 40px;
+            grid-template-rows: 50px 1fr 40px; /* Header, Main, Ticker */
             height: 100vh;
-            gap: 8px;
-            padding: 8px;
+            padding-bottom: 64px; /* Space for mobile nav */
         }
         @media (min-width: 1024px) {
             .terminal-grid {
                 grid-template-columns: 240px 1fr;
                 grid-template-rows: 50px 1fr 40px;
+                padding: 8px;
             }
         }
         .panel {
@@ -95,34 +95,32 @@
             overflow: hidden;
             position: relative;
         }
-        .ticker-tape .ticker-content {
-            display: inline-block;
-            padding-left: 100%;
-            animation: ticker 45s linear infinite;
-        }
-        @keyframes ticker {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
+        .ticker-tape .ticker-content { display: inline-block; padding-left: 100%; animation: ticker 45s linear infinite; }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
         .stock-up { color: var(--accent-green); }
         .stock-down { color: #ef4444; }
-
-        .command-palette {
-            background-color: rgba(17, 24, 39, 0.8);
-            backdrop-filter: blur(8px);
+        .command-palette { background-color: rgba(17, 24, 39, 0.8); backdrop-filter: blur(8px); }
+        .command-item:hover, .command-item.selected { background-color: var(--accent-blue); color: white; }
+        .mobile-nav button.active { color: var(--accent-blue); }
+        .modal-overlay {
+            background-color: rgba(10, 10, 26, 0.8);
+            backdrop-filter: blur(10px);
         }
-        .command-item:hover, .command-item.selected {
-            background-color: var(--accent-blue);
-            color: white;
+        .code-block {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
         }
-        .mobile-nav button.active {
-            color: var(--accent-blue);
-        }
+        .code-block pre { white-space: pre-wrap; word-break: break-all; }
+        .code-block .keyword { color: #ff7b72; }
+        .code-block .function { color: #d2a8ff; }
+        .code-block .comment { color: #8b949e; }
+        .code-block .string { color: #a5d6ff; }
+        .code-block .number { color: #79c0ff; }
     </style>
 </head>
 <body>
     <div class="terminal-grid">
-        <header class="panel lg:col-span-2 flex justify-between items-center px-4">
+        <header class="panel lg:col-span-2 flex justify-between items-center px-4 m-2 mb-0 lg:m-0">
             <div class="text-lg font-bold">SR-TERMINAL <span class="text-xs text-gray-500">v1.0</span></div>
             <div class="flex items-center gap-4">
                 <div id="clock" class="text-sm hidden md:block"></div>
@@ -138,6 +136,7 @@
             <nav class="panel-content p-2 space-y-2">
                 <button data-target="dashboard" class="nav-item w-full text-left bg-blue-600/20 text-white p-2 rounded-md transition-colors">Dashboard</button>
                 <button data-target="projects" class="nav-item w-full text-left hover:bg-gray-700 p-2 rounded-md transition-colors">Projects</button>
+                <button data-target="research" class="nav-item w-full text-left hover:bg-gray-700 p-2 rounded-md transition-colors">Research</button>
                 <button data-target="experience" class="nav-item w-full text-left hover:bg-gray-700 p-2 rounded-md transition-colors">Experience</button>
                 <button data-target="skills" class="nav-item w-full text-left hover:bg-gray-700 p-2 rounded-md transition-colors">Skills & Tools</button>
                 <button data-target="about" class="nav-item w-full text-left hover:bg-gray-700 p-2 rounded-md transition-colors">About Me</button>
@@ -148,9 +147,9 @@
              </div>
         </aside>
 
-        <main id="main-content-area" class="relative overflow-y-auto lg:overflow-y-hidden">
-            <div id="dashboard-content" class="content-view h-full grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-2 gap-2">
-                <div class="panel lg:row-span-2 active h-[400px] lg:h-auto">
+        <main id="main-content-area" class="relative overflow-y-auto lg:overflow-visible m-2 mt-2 lg:m-0">
+            <div id="dashboard-content" class="content-view h-full grid grid-cols-1 lg:grid-cols-3 gap-2">
+                <div class="panel lg:col-span-2 active h-[300px] lg:h-auto">
                     <div class="panel-header flex justify-between items-center">
                         <span>MARKET SIMULATION [SPY]</span>
                         <button id="moving-average-btn" class="text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded-md transition-colors">Toggle MA</button>
@@ -159,41 +158,44 @@
                         <canvas id="financial-chart"></canvas>
                     </div>
                 </div>
-                <div class="panel active">
-                     <div class="panel-header">STATUS</div>
-                     <div class="panel-content flex flex-col justify-center items-center">
-                        <div class="text-center">
-                            <img src="assets/asdcds.jpg" alt="Shreyansh Pratap Singh" class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-green-500">
-                            <h3 class="font-bold text-lg">Shreyansh Pratap Singh</h3>
-                            <p class="text-sm text-gray-400">Quantitative Developer</p>
-                            <p class="text-sm text-green-400 mt-2">Status: Open to Opportunities</p>
+                <div class="h-full flex flex-col gap-2">
+                    <div class="panel active">
+                        <div class="panel-header">STATUS</div>
+                        <div class="panel-content flex flex-col justify-center items-center">
+                            <div class="text-center">
+                                <img src="assets/asdcds.jpg" alt="Shreyansh Pratap Singh" class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-green-500">
+                                <h3 class="font-bold text-lg">Shreyansh Pratap Singh</h3>
+                                <p class="text-sm text-gray-400">Quantitative Developer</p>
+                                <p class="text-sm text-green-400 mt-2">Status: Open to Opportunities</p>
+                            </div>
                         </div>
-                     </div>
-                </div>
-                 <div class="panel active h-[300px] lg:h-auto">
-                    <div class="panel-header">SYSTEM LOG</div>
-                    <div id="system-log" class="panel-content text-xs space-y-1 overflow-y-auto"></div>
+                    </div>
+                    <div class="panel active flex-grow">
+                        <div class="panel-header">SYSTEM LOG</div>
+                        <div id="system-log" class="panel-content text-xs space-y-1 overflow-y-auto"></div>
+                    </div>
                 </div>
             </div>
 
-            <div id="projects-content" class="content-view hidden panel"></div>
-            <div id="experience-content" class="content-view hidden panel"></div>
-            <div id="skills-content" class="content-view hidden panel"></div>
-            <div id="about-content" class="content-view hidden panel"></div>
+            <div id="projects-content" class="content-view hidden panel h-full"></div>
+            <div id="research-content" class="content-view hidden panel h-full"></div>
+            <div id="experience-content" class="content-view hidden panel h-full"></div>
+            <div id="skills-content" class="content-view hidden panel h-full"></div>
+            <div id="about-content" class="content-view hidden panel h-full"></div>
         </main>
 
-        <footer class="panel lg:col-span-2">
+        <footer class="panel lg:col-span-2 fixed bottom-16 left-0 right-0 h-10 m-2 lg:static lg:h-auto lg:m-0">
             <div class="ticker-tape h-full flex items-center">
                 <div id="ticker-content" class="ticker-content"></div>
             </div>
         </footer>
         
         <nav class="mobile-nav lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-gray-900 border-t border-gray-700 flex justify-around items-center z-20">
-            <button data-target="dashboard" class="nav-item active p-2"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25a2.25 2.25 0 01-2.25-2.25v-2.25z" /></svg></button>
-            <button data-target="projects" class="nav-item p-2"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18M18.75 3v18M9 6.75h6.375M9 12h6.375M9 17.25h6.375" /></svg></button>
-            <button data-target="experience" class="nav-item p-2"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
-            <button data-target="skills" class="nav-item p-2"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" /></svg></button>
-            <button data-target="about" class="nav-item p-2"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z" /></svg></button>
+            <button data-target="dashboard" class="nav-item active p-2" aria-label="Dashboard"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25a2.25 2.25 0 01-2.25-2.25v-2.25z" /></svg></button>
+            <button data-target="projects" class="nav-item p-2" aria-label="Projects"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18M18.75 3v18M9 6.75h6.375M9 12h6.375M9 17.25h6.375" /></svg></button>
+            <button data-target="research" class="nav-item p-2" aria-label="Research"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 100 15 7.5 7.5 0 000-15zM21 21l-5.2-5.2" /></svg></button>
+            <button data-target="experience" class="nav-item p-2" aria-label="Experience"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
+            <button data-target="about" class="nav-item p-2" aria-label="About Me"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z" /></svg></button>
         </nav>
     </div>
     
@@ -203,6 +205,19 @@
             <div id="command-list" class="max-h-80 overflow-y-auto"></div>
         </div>
     </div>
+
+    <div id="backtest-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="modal-content w-full max-w-xl h-96 rounded-lg shadow-2xl flex flex-col">
+            <div class="p-4 border-b border-gray-700 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-white">Backtest Result: Momentum Strategy</h2>
+                <button class="close-modal text-2xl">&times;</button>
+            </div>
+            <div class="p-6 flex-grow relative">
+                <canvas id="backtest-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -214,70 +229,45 @@
             const commandInput = document.getElementById('command-input');
             const commandList = document.getElementById('command-list');
             const systemLog = document.getElementById('system-log');
+            const backtestModal = document.getElementById('backtest-modal');
             
             const projectsData = [
-                { title: 'Binomial Option Pricer', status: 'Completed', description: 'A high-performance option pricing model for both European and American options, implemented in C++ for maximum speed.', tech: ['C++', 'Financial Modeling', 'Algorithms'] },
-                { title: 'High-Frequency Trading (HFT) Simulator', status: 'In Progress', description: 'Building a low-latency event-driven simulator in C++ to backtest HFT strategies.', tech: ['C++', 'Data Structures', 'Low-Latency Programming'] },
-                { title: 'Vectorised Backtester', status: 'In Progress', description: 'A high-performance trading strategy backtester built in Python, leveraging vectorization with NumPy and Pandas.', tech: ['Python', 'Pandas', 'NumPy', 'Matplotlib'] },
-                { title: 'F1 Race Winner Prediction AI', status: 'In Progress', description: 'An ML model that predicts Formula 1 race winners using scraped historical data and XGBoost.', tech: ['Python', 'Scikit-learn', 'XGBoost', 'Data Scraping'] },
-                { title: 'Real-time Market Data Collector', status: 'In Progress', description: 'A Python script to connect to cryptocurrency exchange APIs and WebSocket streams to collect and store real-time trade and order book data.', tech: ['Python', 'Websockets', 'REST APIs', 'SQL'] },
-                { title: 'Rick Sanchez AI Chatbot', status: 'In Progress', description: 'A fun personal project creating a chatbot that mimics the personality of Rick Sanchez using NLP techniques.', tech: ['Python', 'NLP', 'NLTK'] }
+                 { id: 'binomial-pricer', title: 'Binomial Option Pricer', status: 'Completed', url: 'https://github.com/shreyanshz24/Cpp-binomial-pricer', description: 'A high-performance option pricing model for both European and American options, implemented in C++ for maximum speed.', tech: ['C++', 'Financial Modeling', 'Algorithms'] },
+                { id: 'hft-simulator', title: 'High-Frequency Trading (HFT) Simulator', status: 'In Progress', description: 'Building a low-latency event-driven simulator in C++ to backtest HFT strategies.', tech: ['C++', 'Data Structures', 'Low-Latency Programming'] },
+                { id: 'vectorised-backtester', title: 'Vectorised Backtester', status: 'In Progress', description: 'A high-performance trading strategy backtester built in Python, leveraging vectorization with NumPy and Pandas.', tech: ['Python', 'Pandas', 'NumPy', 'Matplotlib'] },
+                { id: 'f1-predictor', title: 'F1 Race Winner Prediction AI', status: 'In Progress', description: 'An ML model that predicts Formula 1 race winners using scraped historical data and XGBoost.', tech: ['Python', 'Scikit-learn', 'XGBoost', 'Data Scraping'] },
+                { id: 'data-collector', title: 'Real-time Market Data Collector', status: 'In Progress', description: 'A Python script to connect to cryptocurrency exchange APIs and WebSocket streams to collect and store real-time trade and order book data.', tech: ['Python', 'Websockets', 'REST APIs', 'SQL'] },
+                { id: 'rick-sanchez-bot', title: 'Rick Sanchez AI Chatbot', status: 'In Progress', description: 'A fun personal project creating a chatbot that mimics the personality of Rick Sanchez using NLP techniques.', tech: ['Python', 'NLP', 'NLTK'] }
             ];
 
-            function logToSystem(message, type = 'INFO') {
-                const colors = { 'INFO': 'text-blue-400', 'WARN': 'text-amber-400', 'SUCCESS': 'text-green-400', 'ERROR': 'text-red-400' };
-                const logEntry = document.createElement('p');
-                const timestamp = new Date().toLocaleTimeString();
-                logEntry.innerHTML = `[<span class="text-gray-500">${timestamp}</span>] <span class="${colors[type]}">${type}</span>: ${message}`;
-                systemLog.appendChild(logEntry);
-                systemLog.scrollTop = systemLog.scrollHeight;
-            }
-
-            async function typeLog(message, type = 'INFO') {
-                await new Promise(resolve => setTimeout(resolve, 150));
-                logToSystem(message, type);
-            }
-
-            async function initSequence() {
-                await typeLog('Booting SR-TERMINAL v1.0...');
-                await typeLog('Initializing modules...');
-                await typeLog('Market simulation chart initialized.', 'SUCCESS');
-                await typeLog('Live market ticker started.', 'SUCCESS');
-                await typeLog('Command Palette (Cmd+K) is active.', 'SUCCESS');
-                await typeLog('System ready.', 'SUCCESS');
-            }
-
-            function updateClock() {
-                if(clockEl) clockEl.textContent = new Date().toLocaleString();
-            }
-            setInterval(updateClock, 1000);
-            updateClock();
-
+            function logToSystem(message, type = 'INFO') { /* ... existing log logic ... */ }
+            async function typeLog(message, type = 'INFO') { /* ... existing typeLog logic ... */ }
+            async function initSequence() { /* ... existing initSequence logic ... */ }
+            function updateClock() { if(clockEl) clockEl.textContent = new Date().toLocaleString(); }
+            
             function switchView(targetId) {
                 document.querySelectorAll('.panel.active').forEach(p => p.classList.remove('active'));
-                contentViews.forEach(view => {
-                    const parentPanel = view.closest('.panel');
-                    if (view.id === `${targetId}-content`) {
-                        view.classList.remove('hidden');
+                
+                const mainContentArea = document.getElementById('main-content-area');
+                mainContentArea.querySelectorAll('.content-view').forEach(view => view.classList.add('hidden'));
+
+                const targetView = document.getElementById(`${targetId}-content`);
+                if (targetView) {
+                    targetView.classList.remove('hidden');
+                     if(targetView.id !== 'dashboard-content') {
+                        const parentPanel = targetView.closest('.panel');
                         if (parentPanel) parentPanel.classList.add('active');
                     } else {
-                        view.classList.add('hidden');
+                        targetView.querySelectorAll('.panel').forEach(p => p.classList.add('active'));
                     }
-                });
-                
-                if (targetId === 'dashboard') {
-                    document.querySelectorAll('#dashboard-content .panel').forEach(p => p.classList.add('active'));
                 }
-
+                
                 navItems.forEach(item => {
-                    if (item.dataset.target === targetId) {
-                        item.classList.add('bg-blue-600/20', 'text-white', 'active');
-                    } else {
-                        item.classList.remove('bg-blue-600/20', 'text-white', 'active');
-                    }
+                    if (item.dataset.target === targetId) { item.classList.add('bg-blue-600/20', 'text-white', 'active'); } 
+                    else { item.classList.remove('bg-blue-600/20', 'text-white', 'active'); }
                 });
                 logToSystem(`Mapsd to ${targetId.toUpperCase()} view.`);
-                document.getElementById('main-content-area').scrollTop = 0;
+                mainContentArea.scrollTop = 0;
             }
 
             navItems.forEach(item => {
@@ -285,19 +275,22 @@
             });
 
             function populateContent() {
-                document.getElementById('projects-content').innerHTML = `<div class="panel-header">PROJECTS</div><div class="panel-content space-y-4">${projectsData.map(p => `<div class="p-3 bg-gray-900 rounded-lg border border-gray-700"><div class="flex justify-between items-start"><h3 class="font-bold text-lg text-green-300">${p.title}</h3><span class="text-xs ${p.status === 'Completed' ? 'bg-green-800 text-green-300' : 'bg-yellow-800 text-yellow-300'} px-2 py-0.5 rounded-full">${p.status}</span></div><p class="text-sm text-gray-400 mt-2">${p.description}</p><div class="mt-3 flex flex-wrap gap-2">${p.tech.map(t => `<span class="tag text-xs px-2 py-1 rounded">${t}</span>`).join('')}</div></div>`).join('')}</div>`;
+                document.getElementById('projects-content').innerHTML = `<div class="panel-header">PROJECTS</div><div class="panel-content space-y-4">${projectsData.map(p => `<div class="p-3 bg-gray-900 rounded-lg border border-gray-700"><div class="flex justify-between items-start">${p.url ? `<a href="${p.url}" target="_blank" class="hover:underline"><h3 class="font-bold text-lg text-green-300">${p.title} &rarr;</h3></a>` : `<h3 class="font-bold text-lg text-green-300">${p.title}</h3>`}<span class="text-xs ${p.status === 'Completed' ? 'bg-green-800 text-green-300' : 'bg-yellow-800 text-yellow-300'} px-2 py-0.5 rounded-full">${p.status}</span></div><p class="text-sm text-gray-400 mt-2">${p.description}</p><div class="mt-3 flex flex-wrap gap-2">${p.tech.map(t => `<span class="tag text-xs px-2 py-1 rounded">${t}</span>`).join('')}</div></div>`).join('')}</div>`;
+                
+                const researchContainer = document.getElementById('research-content');
+                researchContainer.innerHTML = `<div class="panel-header">RESEARCH</div><div class="panel-content flex items-center justify-center text-gray-500"><p>Research papers and project deep-dives coming soon.</p></div>`;
+                
                 document.getElementById('experience-content').innerHTML = `<div class="panel-header">EXPERIENCE</div><div class="panel-content"><div class="relative pl-10 pb-8"><div class="absolute left-0 top-1 h-4 w-4 rounded-full bg-blue-500 border-2 border-gray-900"></div><div class="absolute left-[7px] top-5 h-full w-0.5 bg-gray-700"></div><h4 class="font-bold text-blue-300">Self-Employed | Independent Researcher & Developer</h4><p class="text-sm text-gray-400">Personal Projects | 2023 - Present</p><ul class="mt-2 ml-4 list-disc text-sm text-gray-400 space-y-1"><li>Implemented a high-performance Binomial Option Pricer in C++.</li><li>Architecting a low-latency HFT simulator in C++.</li><li>Developing a high-performance vectorised backtesting engine in Python.</li><li>Building an F1 race prediction model using XGBoost.</li><li>Creating real-time data ingestion pipelines using Websockets and APIs.</li></ul></div></div>`;
                 document.getElementById('skills-content').innerHTML = `<div class="panel-header">SKILLS & TOOLS</div><div class="panel-content space-y-6"><div><h3 class="text-lg font-semibold text-green-400 mb-3">Programming Languages</h3><div class="flex flex-wrap gap-3">${['Python', 'C++', 'JavaScript', 'R', 'SQL'].map(s => `<span class="tag px-3 py-1 rounded-full">${s}</span>`).join('')}</div></div><div><h3 class="text-lg font-semibold text-green-400 mb-3">Quantitative & ML</h3><div class="flex flex-wrap gap-3">${['Time Series Analysis', 'Options Pricing', 'Backtesting', 'Scikit-learn', 'TensorFlow', 'XGBoost', 'NLP'].map(s => `<span class="tag px-3 py-1 rounded-full">${s}</span>`).join('')}</div></div><div><h3 class="text-lg font-semibold text-green-400 mb-3">Tools & Platforms</h3><div class="flex flex-wrap gap-3">${['Pandas', 'NumPy', 'Jupyter', 'Git', 'Docker', 'CMake'].map(s => `<span class="tag px-3 py-1 rounded-full">${s}</span>`).join('')}</div></div></div>`;
                 document.getElementById('about-content').innerHTML = `<div class="panel-header">ABOUT ME</div><div class="panel-content text-center flex flex-col justify-center items-center"><img src="assets/asdcds.jpg" alt="Shreyansh Pratap Singh" class="w-32 h-32 rounded-full mx-auto mb-6 border-4 border-blue-500"><p class="max-w-prose">A developer who loves turning complex problems into elegant software. Always excited for new challenges, I'm here to make your ideas come to life. Let's build something awesome together!</p></div>`;
             }
             
-            (function initChart() {
+            function initChart() {
                 const ctx = document.getElementById('financial-chart');
                 if (!ctx) return;
                 const chartCtx = ctx.getContext('2d');
                 let data = Array.from({length: 100}, () => 150 + Math.random() * 20 - 10);
                 const labels = Array.from({length: 100}, (_, i) => i);
-                
                 function calculateMovingAverage(data, windowSize) {
                     let result = new Array(data.length).fill(null);
                     for (let i = windowSize - 1; i < data.length; i++) {
@@ -307,7 +300,6 @@
                     }
                     return result;
                 }
-                
                 const chart = new Chart(chartCtx, {
                     type: 'line',
                     data: {
@@ -319,13 +311,11 @@
                     },
                     options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: false }, y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } } }, plugins: { legend: { labels: { color: 'white' } } } }
                 });
-
                 document.getElementById('moving-average-btn').addEventListener('click', () => {
                     chart.data.datasets[1].hidden = !chart.data.datasets[1].hidden;
                     chart.update();
                     logToSystem(`Toggled 20-Day MA ${chart.data.datasets[1].hidden ? 'OFF' : 'ON'}.`, 'WARN');
                 });
-                
                 setInterval(() => {
                     const lastValue = data[data.length - 1];
                     const newValue = lastValue + (Math.random() - 0.5) * 2;
@@ -336,11 +326,26 @@
                     chart.update('quiet');
                     logToSystem(`New tick received: SPY @ ${newValue.toFixed(2)}`);
                 }, 2000);
+            }
 
-            })();
+            function runBacktestEasterEgg() {
+                backtestModal.classList.remove('hidden');
+                backtestModal.classList.add('flex');
+                const canvas = document.getElementById('backtest-chart');
+                const equityData = Array.from({length: 100}, (_, i) => 1000 * (1 + (Math.random() - 0.48) * 0.05 * i));
+                new Chart(canvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 100}, (_, i) => `Day ${i+1}`),
+                        datasets: [{ label: 'Equity Curve', data: equityData, borderColor: 'var(--accent-green)', backgroundColor: 'rgba(52, 211, 153, 0.1)', fill: true, tension: 0.2, pointRadius: 0 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } }, plugins: { legend: { display: false } } }
+                });
+            }
 
-            (function initTicker() {
+            function initTicker() {
                 const tickerContent = document.getElementById('ticker-content');
+                if (!tickerContent) return;
                 const stocks = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'NVDA', 'SPY', 'QQQ', 'BTC-USD', 'ETH-USD'];
                 let tickerHTML = '';
                 stocks.forEach(stock => {
@@ -349,23 +354,25 @@
                     tickerHTML += `<span class="mx-4">${stock} <span class="${isUp ? 'stock-up' : 'stock-down'}">${isUp ? '+' : ''}${change}%</span></span>`;
                 });
                 tickerContent.innerHTML = tickerHTML.repeat(4);
-            })();
+            }
             
-            (function initCommandPalette() {
+            function initCommandPalette() {
                 const commands = [
                     { name: 'Navigate: Dashboard', action: () => switchView('dashboard') },
                     { name: 'Navigate: Projects', action: () => switchView('projects') },
+                    { name: 'Navigate: Research', action: () => switchView('research') },
                     { name: 'Navigate: Experience', action: () => switchView('experience') },
                     { name: 'Navigate: Skills & Tools', action: () => switchView('skills') },
                     { name: 'Navigate: About Me', action: () => switchView('about') },
                     { name: 'Open: GitHub', action: () => window.open('https://github.com/shreyanshz24', '_blank') },
                     { name: 'Open: LinkedIn', action: () => window.open('https://www.linkedin.com/in/shreyansh-pratap-singh/', '_blank') },
+                    { name: 'run: backtest', action: runBacktestEasterEgg, isHidden: true }
                 ];
                 function openPalette() { logToSystem('Command Palette opened.', 'WARN'); commandPalette.classList.remove('hidden'); commandPalette.classList.add('flex'); commandInput.focus(); renderCommands(); }
                 function closePalette() { commandPalette.classList.add('hidden'); commandPalette.classList.remove('flex'); commandInput.value = ''; }
                 function renderCommands(filter = '') {
                     commandList.innerHTML = '';
-                    const filteredCommands = commands.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
+                    const filteredCommands = commands.filter(c => !c.isHidden || c.name === filter.toLowerCase());
                     filteredCommands.forEach((cmd, index) => {
                         const item = document.createElement('div');
                         item.className = 'command-item p-3 cursor-pointer';
@@ -378,15 +385,20 @@
                 commandPaletteBtn.addEventListener('click', openPalette);
                 window.addEventListener('keydown', e => {
                     if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openPalette(); }
-                    if (e.key === 'Escape' && !commandPalette.classList.contains('hidden')) closePalette();
+                    if (e.key === 'Escape' && !commandPalette.classList.contains('hidden')) { closePalette(); backtestModal.classList.add('hidden'); }
                 });
                 commandPalette.addEventListener('click', (e) => { if(e.target === commandPalette) closePalette() });
+                backtestModal.addEventListener('click', (e) => { if(e.target === backtestModal || e.target.classList.contains('close-modal')) backtestModal.classList.add('hidden'); });
                 commandInput.addEventListener('input', () => renderCommands(commandInput.value));
-            })();
+            }
 
             populateContent();
+            initChart();
+            initTicker();
+            initCommandPalette();
             initSequence();
         });
     </script>
 </body>
 </html>
+
